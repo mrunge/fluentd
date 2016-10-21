@@ -1,6 +1,12 @@
 # Generated from fluentd-0.12.2.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name fluentd
 
+%if 0%{?fedora}
+%global with_test 1
+%else
+%global with_test 0
+%endif
+
 %define fluentd_user	fluentd
 %define fluentd_group	%{fluentd_user}
 
@@ -22,25 +28,29 @@ Source2:	fluentd.logrotate
 BuildRequires:	systemd
 BuildRequires:	rubygems-devel
 BuildRequires:	ruby >= 1.9.3
-BuildRequires:	rubygem(thread_safe)
+BuildRequires:	rubygem-thread_safe
+
+%if 0%{with_test}
 ## Unit tests requires:
+
 BuildRequires:	rubygem(test-unit)
 BuildRequires:	rubygem(rr)
 BuildRequires:	rubygem(test-unit-rr)
 BuildRequires:	procps-ng
 BuildRequires:	hostname
-BuildRequires:	rubygem(yajl-ruby) >= 1.0
-BuildRequires:	rubygem(serverengine) >= 2.0
-BuildRequires:	rubygem(cool.io) >= 1.4.5
-BuildRequires:	rubygem(msgpack) >= 0.7.0
-BuildRequires:	rubygem(strptime) >= 0.1.7
+BuildRequires:	rubygem(yajl-ruby)
+BuildRequires:	rubygem(serverengine)
+BuildRequires:	rubygem(cool.io)
+BuildRequires:	rubygem(msgpack)
+BuildRequires:	rubygem(strptime)
 BuildRequires:	rubygem(tzinfo) >= 1.0
 BuildRequires:	rubygem(flexmock) >= 2.0
 BuildRequires:	rubygem(timecop) >= 0.3
 BuildRequires:	rubygem(http_parser.rb) >= 0.5.1
 BuildRequires:	rubygem(simplecov) >= 0.7
-BuildRequires:	rubygem(oj) >= 2.14
-BuildRequires:	rubygem(parallel_tests) >= 0.15.3
+BuildRequires:	rubygem(oj)
+BuildRequires:	rubygem(parallel_tests)
+%endif
 
 Requires:	logrotate
 Requires:	rubygem(msgpack) >= 0.7.0
@@ -126,9 +136,10 @@ rm -f %{buildroot}%{gem_instdir}/{.gitignore,.travis.yml,appveyor.yml,Vagrantfil
 
 # Run the test suite
 %check
+
 pushd .%{gem_instdir}
 # Tests disabled on EL due to outdated test-unit
-%if 0%{?fedora} > 0
+%if 0%{?with_test}
 ruby -rtest-unit -e 'Test::Unit::AutoRunner.run(true)' -Ilib:test test/**/test_*.rb
 %endif
 popd
